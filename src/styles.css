@@ -1,0 +1,40 @@
+@font-face {
+  font-family: crayon;
+  src: url("assets/過充電FONT くれよん/KajudenFont-Crayon.ttf");
+}
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  flex: none;
+  border: 0 solid transparent;
+}
+
+* {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  -webkit-text-size-adjust: 100%;
+  font-family: crayon, sans-serif;
+  background: linear-gradient(hsl(150, 50%, 24%), hsl(150, 50%, 16%));
+  color: white;
+  line-height: 1.2;
+}
+
+button {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+}
+
+[hidden] {
+  display: none !important;
+}
