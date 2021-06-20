@@ -35,6 +35,6 @@ export const QuestionAndAnswer = (props: { question: Question; answer?: number }
 };
 
 export const toAnswer = (word: string) => {
-  const numeric = word && word.match(/(-?[0-9]+).*?$/)?.[1];
+  const numeric = word && word.match(/(-?[0-9]+)[^0-9]*$/)?.[1];
   return numeric ? +numeric : undefined;
 };
