@@ -14,31 +14,34 @@ const [spokenAnswer, setSpokenAnswer] = createSignal<number | undefined>();
 const [recognitionError, setRecognitionError] = createSignal<[string, string] | undefined>();
 const answerIsCorrect = createMemo(() => spokenAnswer() === question().correctAnswer);
 
-const recognition = new (window.SpeechRecognition ?? window.webkitSpeechRecognition)();
-recognition.lang = lang;
-recognition.continuous = true;
-recognition.interimResults = true;
-recognition.maxAlternatives = 1;
-recognition.onend = function () {
-  setSpeaking(false);
-  setTimeout(() => this.start(), 1000);
-};
-recognition.onaudiostart = () =>
-  batch(() => {
-    setSpeaking(true);
-    setSpokenWord("");
-    setRecognitionError();
-  });
-recognition.onaudioend = () => setSpeaking(false);
-recognition.onerror = (e) => setRecognitionError([e.error, e.message]);
-recognition.onresult = ({ results, resultIndex }) => {
-  const result = results[resultIndex];
-  const spokenWord = result?.[0]?.transcript ?? "";
-  batch(() => {
-    setSpokenWord(spokenWord);
-    result?.isFinal && setSpokenAnswer(toAnswer(spokenWord));
-  });
-};
+const assign: <T>(target: T, source: Partial<T>) => T = Object.assign;
+
+const recognition = assign(new (window.SpeechRecognition ?? window.webkitSpeechRecognition)(), {
+  lang: lang,
+  continuous: true,
+  interimResults: true,
+  maxAlternatives: 1,
+  onend: function () {
+    setSpeaking(false);
+    setTimeout(() => this.start(), 1000);
+  },
+  onaudiostart: () =>
+    batch(() => {
+      setSpeaking(true);
+      setSpokenWord("");
+      setRecognitionError();
+    }),
+  onaudioend: () => setSpeaking(false),
+  onerror: (e) => setRecognitionError([e.error, e.message]),
+  onresult: ({ results, resultIndex }) => {
+    const result = results[resultIndex];
+    const spokenWord = result?.[0]?.transcript ?? "";
+    batch(() => {
+      setSpokenWord(spokenWord);
+      result?.isFinal && setSpokenAnswer(toAnswer(spokenWord));
+    });
+  },
+});
 recognition.start();
 
 const resetRecognition = () => {
@@ -48,14 +51,8 @@ const resetRecognition = () => {
   recognition.stop();
 };
 
-const correctAnswerUtterance = new SpeechSynthesisUtterance("正解");
-correctAnswerUtterance.lang = lang;
-correctAnswerUtterance.rate = 1.25;
-correctAnswerUtterance.pitch = 1.1;
-
-const wrongAnswerUtterance = new SpeechSynthesisUtterance("ちがうよ");
-wrongAnswerUtterance.lang = lang;
-wrongAnswerUtterance.rate = 1.2;
+const correctAnswerUtterance = assign(new SpeechSynthesisUtterance("正解"), { lang, rate: 1.25, pitch: 1.1 });
+const wrongAnswerUtterance = assign(new SpeechSynthesisUtterance("ちがうよ"), { lang: lang, rate: 1.2 });
 
 const Main = () => {
   createEffect(() => {
