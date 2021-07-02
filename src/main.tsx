@@ -10,21 +10,19 @@ const [question, setQuestion] = createSignal(createQuestion());
 
 const [speaking, setSpeaking] = createSignal<boolean>();
 const [spokenWord, setSpokenWord] = createSignal("");
-const [spokenAnswer, setSpokenAnswer] = createSignal<number | undefined>();
+const [spokenAnswer, setSpokenAnswer] = createSignal<number | null | undefined>();
 const [recognitionError, setRecognitionError] = createSignal<[string, string] | undefined>();
 const answerIsCorrect = createMemo(() => spokenAnswer() === question().correctAnswer);
 
 const assign: <T>(target: T, source: Partial<T>) => T = Object.assign;
 
+let answerTimerId: number | undefined;
 const recognition = assign(new (window.SpeechRecognition ?? window.webkitSpeechRecognition)(), {
   lang: lang,
   continuous: true,
   interimResults: true,
   maxAlternatives: 1,
-  onend: function () {
-    setSpeaking(false);
-    setTimeout(() => this.start(), 1000);
-  },
+  onend: () => setSpeaking(false),
   onaudiostart: () =>
     batch(() => {
       setSpeaking(true);
@@ -32,52 +30,69 @@ const recognition = assign(new (window.SpeechRecognition ?? window.webkitSpeechR
       setRecognitionError();
     }),
   onaudioend: () => setSpeaking(false),
-  onerror: (e) => setRecognitionError([e.error, e.message]),
+  onerror: (e) => {
+    setRecognitionError([e.error, e.message]);
+    setTimeout(resetRecognition, 1000);
+  },
   onresult: ({ results, resultIndex }) => {
     const result = results[resultIndex];
     const spokenWord = result?.[0]?.transcript ?? "";
-    batch(() => {
+    clearTimeout(answerTimerId);
+    if (result?.isFinal) {
+      batch(() => {
+        setSpokenWord(spokenWord);
+        setSpokenAnswer(toAnswer(spokenWord) ?? null);
+      });
+    } else {
       setSpokenWord(spokenWord);
-      result?.isFinal && setSpokenAnswer(toAnswer(spokenWord));
-    });
+      answerTimerId = setTimeout(() => setSpokenAnswer(toAnswer(spokenWord)), 1000);
+    }
   },
 });
-recognition.start();
 
 const resetRecognition = () => {
   setSpokenWord("");
   setSpokenAnswer();
   setRecognitionError();
   recognition.stop();
+  setTimeout(() => recognition.start());
 };
 
-const correctAnswerUtterance = assign(new SpeechSynthesisUtterance("正解"), { lang, rate: 1.25, pitch: 1.1 });
-const wrongAnswerUtterance = assign(new SpeechSynthesisUtterance("ちがうよ"), { lang: lang, rate: 1.2 });
-
 const Main = () => {
+  const startRecognition = () => recognition.start();
+  const utteranceOptions: Readonly<Partial<SpeechSynthesisUtterance>> = { lang, rate: 1.25, pitch: 1.1 };
+  const questionUtterance = assign(new SpeechSynthesisUtterance(), { ...utteranceOptions, onend: startRecognition });
+  const correctAnswerUtterance = assign(new SpeechSynthesisUtterance("正解"), utteranceOptions);
+  const wrongAnswerUtterance = assign(new SpeechSynthesisUtterance("ちがうよ?"), { ...utteranceOptions, onend: startRecognition });
   createEffect(() => {
-    if (spokenAnswer()) {
-      recognition.stop();
-      if (answerIsCorrect()) {
-        speechSynthesis.speak(correctAnswerUtterance);
-        setTimeout(
-          () =>
-            batch(() => {
-              setSpokenAnswer(undefined);
-              setQuestion(createQuestion());
-            }),
-          1000
-        );
-      } else {
-        speechSynthesis.speak(wrongAnswerUtterance);
-        setTimeout(() => setSpokenAnswer(undefined), 1000);
-      }
+    questionUtterance.text = question().speech;
+    speechSynthesis.speak(questionUtterance);
+  });
+  createEffect(() => {
+    if (spokenAnswer() === undefined) {
+      return;
+    }
+    if (spokenAnswer() === null) {
+      return startRecognition();
+    }
+    recognition.stop();
+    if (answerIsCorrect()) {
+      speechSynthesis.speak(correctAnswerUtterance);
+      setTimeout(() => {
+        batch(() => {
+          setSpokenAnswer(undefined);
+          setQuestion(createQuestion());
+        });
+      }, 1000);
+    } else {
+      speechSynthesis.speak(wrongAnswerUtterance);
+      setTimeout(() => setSpokenAnswer(undefined), 1000);
     }
   });
   return (
     <>
       <main class="relative flex-auto flex items-center justify-center text-12vw">
-        <QuestionAndAnswer question={question()} answer={spokenAnswer()} />
+        <QuestionAndAnswer question={question()} answer={spokenAnswer() ?? undefined} />
         <div
           class="absolute inset-0 flex items-center justify-center text-24vw pointer-events-none select-none"
           hidden={!answerIsCorrect()}
