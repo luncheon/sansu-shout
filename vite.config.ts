@@ -7,6 +7,11 @@ export default defineConfig({
   build: {
     outDir: "docs",
     assetsDir: "",
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
   plugins: [windiCssPlugin({ config: { prefixer: false, preflight: false } }), solidPlugin()],
 });
