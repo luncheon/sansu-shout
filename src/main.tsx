@@ -1,6 +1,7 @@
 import { batch, createEffect, createMemo, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import "virtual:windi.css";
+import correctImage from "./assets/correct.png"; // https://www.ac-illust.com/main/detail.php?id=2637780
 import { createQuestion, QuestionAndAnswer, toAnswer } from "./question";
 import "./styles.css";
 
@@ -91,12 +92,11 @@ const Main = () => {
     <>
       <main class="relative flex-auto flex items-center justify-center text-12vw">
         <QuestionAndAnswer question={question()} answer={spokenAnswer() ?? undefined} />
-        <div
-          class="absolute inset-0 flex items-center justify-center text-24vw pointer-events-none select-none"
+        <img
+          class="absolute inset-0 m-auto pointer-events-none object-contain w-50vw h-50vh"
+          src={correctImage}
           hidden={!answerIsCorrect()}
-        >
-          ⭕️
-        </div>
+        />
       </main>
       <div class="fixed left-4 bottom-3 font-sans">
         <div class="font-bold text-xs opacity-60 mb-1">きこえた ことば</div>
