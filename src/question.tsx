@@ -13,7 +13,7 @@ const questionFactories: (() => Question)[] = [
   () => {
     const x = randomInt(20);
     const y = randomInt(20);
-    return { x, y, correctAnswer: x + y, text: `${x} + ${y} = `, speech: `${speechNumber(x)}たす${speechNumber(y)}は?` };
+    return { x, y, correctAnswer: x + y, text: `${x} + ${y} = `, speech: `${speechNumber(x)} たす ${speechNumber(y)} は?` };
   },
   () => {
     let x = randomInt(20);
@@ -21,7 +21,7 @@ const questionFactories: (() => Question)[] = [
     if (x < y) {
       [x, y] = [y, x];
     }
-    return { x, y, correctAnswer: x - y, text: `${x} - ${y} = `, speech: `${speechNumber(x)}ひく${speechNumber(y)}は?` };
+    return { x, y, correctAnswer: x - y, text: `${x} - ${y} = `, speech: `${speechNumber(x)} ひく ${speechNumber(y)} は?` };
   },
 ];
 

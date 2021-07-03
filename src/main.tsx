@@ -18,66 +18,64 @@ const assign: <T>(target: T, source: Partial<T>) => T = Object.assign;
 
 let answerTimerId: number | undefined;
 const recognition = assign(new (window.SpeechRecognition ?? window.webkitSpeechRecognition)(), {
-  lang: lang,
+  lang,
   continuous: true,
   interimResults: true,
   maxAlternatives: 1,
-  onend: () => setSpeaking(false),
+  onend() {
+    batch(() => {
+      setSpeaking();
+      setSpokenWord("");
+      setRecognitionError();
+    });
+    const start: () => unknown = () => (speechSynthesis.speaking ? setTimeout(start, 200) : recognition.start());
+    start();
+  },
   onaudiostart: () =>
     batch(() => {
       setSpeaking(true);
       setSpokenWord("");
       setRecognitionError();
     }),
-  onaudioend: () => setSpeaking(false),
   onerror: (e) => {
     setRecognitionError([e.error, e.message]);
-    setTimeout(resetRecognition, 1000);
+    setTimeout(() => recognition.stop(), 1000);
   },
   onresult: ({ results, resultIndex }) => {
     const result = results[resultIndex];
     const spokenWord = result?.[0]?.transcript ?? "";
+    const answer = () => setSpokenAnswer(toAnswer(spokenWord) ?? null);
     clearTimeout(answerTimerId);
     if (result?.isFinal) {
       batch(() => {
         setSpokenWord(spokenWord);
-        setSpokenAnswer(toAnswer(spokenWord) ?? null);
+        answer();
       });
     } else {
       setSpokenWord(spokenWord);
-      answerTimerId = setTimeout(() => setSpokenAnswer(toAnswer(spokenWord)), 1000);
+      answerTimerId = setTimeout(answer, 1000);
     }
   },
 });
 
-const resetRecognition = () => {
-  setSpokenWord("");
-  setSpokenAnswer();
-  setRecognitionError();
-  recognition.stop();
-  setTimeout(() => recognition.start());
-};
-
 const Main = () => {
-  const startRecognition = () => recognition.start();
-  const utteranceOptions: Readonly<Partial<SpeechSynthesisUtterance>> = { lang, rate: 1.25, pitch: 1.1 };
-  const questionUtterance = assign(new SpeechSynthesisUtterance(), { ...utteranceOptions, onend: startRecognition });
-  const correctAnswerUtterance = assign(new SpeechSynthesisUtterance("正解"), utteranceOptions);
-  const wrongAnswerUtterance = assign(new SpeechSynthesisUtterance("ちがうよ?"), { ...utteranceOptions, onend: startRecognition });
-  createEffect(() => {
-    questionUtterance.text = question().speech;
-    speechSynthesis.speak(questionUtterance);
-  });
+  recognition.start();
+  const utterance = assign(new SpeechSynthesisUtterance(), { lang, rate: 1.1, pitch: 1.1, onstart: () => recognition.stop() });
+  const speak = (text: string) => {
+    utterance.text = text;
+    speechSynthesis.speak(utterance);
+  };
+  createEffect(() => speak(question().speech));
   createEffect(() => {
     if (spokenAnswer() === undefined) {
       return;
     }
     if (spokenAnswer() === null) {
-      return startRecognition();
+      return recognition.stop();
     }
     recognition.stop();
     if (answerIsCorrect()) {
-      speechSynthesis.speak(correctAnswerUtterance);
+      speak("正解");
       setTimeout(() => {
         batch(() => {
           setSpokenAnswer(undefined);
@@ -85,7 +83,7 @@ const Main = () => {
         });
       }, 1000);
     } else {
-      speechSynthesis.speak(wrongAnswerUtterance);
+      speak("ちがうよ");
       setTimeout(() => setSpokenAnswer(undefined), 1000);
     }
   });
@@ -109,7 +107,7 @@ const Main = () => {
       <button
         class="fixed right-4 bottom-2 p-0 text-xs opacity-60 border-b-current border-b-1 font-sans"
         type="button"
-        onClick={resetRecognition}
+        onClick={() => recognition.stop()}
       >
         マイクリセット
       </button>
