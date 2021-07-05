@@ -1,7 +1,7 @@
 import { batch, createEffect, createMemo, createSignal, For, JSX } from "solid-js";
 import { render } from "solid-js/web";
 import "virtual:windi.css";
-import correctImage from "./assets/correct.png"; // https://www.ac-illust.com/main/detail.php?id=2637780
+import correctImage from "./assets/correct.webp"; // https://www.ac-illust.com/main/detail.php?id=2637780
 import { QuestionAndAnswer, questionFactories, toAnswer } from "./question";
 import "./styles.css";
 
