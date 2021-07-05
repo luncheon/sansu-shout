@@ -23,7 +23,7 @@ const recognition = assign(new (window.SpeechRecognition ?? window.webkitSpeechR
   continuous: true,
   interimResults: true,
   maxAlternatives: 1,
-  onend() {
+  onend: () => {
     batch(() => {
       setSpeaking();
       setSpokenWord("");
@@ -32,12 +32,7 @@ const recognition = assign(new (window.SpeechRecognition ?? window.webkitSpeechR
     const start: () => unknown = () => (speechSynthesis.speaking ? setTimeout(start, 200) : recognition.start());
     start();
   },
-  onaudiostart: () =>
-    batch(() => {
-      setSpeaking(true);
-      setSpokenWord("");
-      setRecognitionError();
-    }),
+  onaudiostart: () => setSpeaking(true),
   onerror: (e) => {
     setRecognitionError([e.error, e.message]);
     setTimeout(() => recognition.stop(), 1000);
@@ -66,7 +61,7 @@ const Main = () => {
     utterance.text = text;
     speechSynthesis.speak(utterance);
   };
-  createEffect(() => speak(question().speech));
+  createEffect(() => speak(question().speechText));
   createEffect(() => {
     if (spokenAnswer() === undefined) {
       return;

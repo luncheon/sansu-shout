@@ -1,9 +1,7 @@
 interface Question {
-  x: number;
-  y: number;
-  text: string;
-  speech: string;
   correctAnswer: number;
+  displayText: string;
+  speechText: string;
 }
 
 const randomInt = (upper: number) => (Math.random() * upper) | 0;
@@ -13,7 +11,7 @@ const questionFactories: (() => Question)[] = [
   () => {
     const x = randomInt(20);
     const y = randomInt(20);
-    return { x, y, correctAnswer: x + y, text: `${x} + ${y} = `, speech: `${speechNumber(x)} たす ${speechNumber(y)} は?` };
+    return { correctAnswer: x + y, displayText: `${x} + ${y} = `, speechText: `${speechNumber(x)} たす ${speechNumber(y)} は?` };
   },
   () => {
     let x = randomInt(20);
@@ -21,7 +19,7 @@ const questionFactories: (() => Question)[] = [
     if (x < y) {
       [x, y] = [y, x];
     }
-    return { x, y, correctAnswer: x - y, text: `${x} - ${y} = `, speech: `${speechNumber(x)} ひく ${speechNumber(y)} は?` };
+    return { correctAnswer: x - y, displayText: `${x} - ${y} = `, speechText: `${speechNumber(x)} ひく ${speechNumber(y)} は?` };
   },
 ];
 
@@ -30,7 +28,7 @@ export const createQuestion = (): Question => questionFactories[(Math.random() *
 export const QuestionAndAnswer = (props: { question: Question; answer?: number }) => {
   return (
     <div class="flex items-center justify-center whitespace-pre">
-      <span>{props.question.text}</span>
+      <span>{props.question.displayText}</span>
       <span class="w-2ex">{props.answer}</span>
     </div>
   );
