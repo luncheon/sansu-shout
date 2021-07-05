@@ -4,26 +4,35 @@ interface Question {
   speechText: string;
 }
 
-const randomInt = (upper: number) => (Math.random() * upper) | 0;
+interface QuestionFactory {
+  displayText: string;
+  question: () => Question;
+}
 
+const randomInt = (upper: number) => (Math.random() * upper) | 0;
 const speechNumber = (n: number) => (n === 0 ? "ゼロ" : n);
-const questionFactories: (() => Question)[] = [
-  () => {
-    const x = randomInt(20);
-    const y = randomInt(20);
-    return { correctAnswer: x + y, displayText: `${x} + ${y} = `, speechText: `${speechNumber(x)} たす ${speechNumber(y)} は?` };
+
+export const questionFactories: QuestionFactory[] = [
+  {
+    displayText: "20 までの たしざん",
+    question: () => {
+      const x = randomInt(20);
+      const y = randomInt(20);
+      return { correctAnswer: x + y, displayText: `${x} + ${y} = `, speechText: `${speechNumber(x)} たす ${speechNumber(y)} は?` };
+    },
   },
-  () => {
-    let x = randomInt(20);
-    let y = randomInt(20);
-    if (x < y) {
-      [x, y] = [y, x];
-    }
-    return { correctAnswer: x - y, displayText: `${x} - ${y} = `, speechText: `${speechNumber(x)} ひく ${speechNumber(y)} は?` };
+  {
+    displayText: "20 までの ひきざん",
+    question: () => {
+      let x = randomInt(20);
+      let y = randomInt(20);
+      if (x < y) {
+        [x, y] = [y, x];
+      }
+      return { correctAnswer: x - y, displayText: `${x} - ${y} = `, speechText: `${speechNumber(x)} ひく ${speechNumber(y)} は?` };
+    },
   },
 ];
-
-export const createQuestion = (): Question => questionFactories[(Math.random() * questionFactories.length) | 0]!();
 
 export const QuestionAndAnswer = (props: { question: Question; answer?: number }) => {
   return (

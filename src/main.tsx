@@ -1,11 +1,14 @@
-import { batch, createEffect, createMemo, createSignal } from "solid-js";
+import { batch, createEffect, createMemo, createSignal, For, JSX } from "solid-js";
 import { render } from "solid-js/web";
 import "virtual:windi.css";
 import correctImage from "./assets/correct.png"; // https://www.ac-illust.com/main/detail.php?id=2637780
-import { createQuestion, QuestionAndAnswer, toAnswer } from "./question";
+import { QuestionAndAnswer, questionFactories, toAnswer } from "./question";
 import "./styles.css";
 
 const lang = "ja";
+
+const [filteredQuestionFactories, setFilteredQuestionFactories] = createSignal<typeof questionFactories>(questionFactories);
+const createQuestion = () => filteredQuestionFactories()[(Math.random() * filteredQuestionFactories().length) | 0]!.question();
 
 const [question, setQuestion] = createSignal(createQuestion());
 
@@ -113,27 +116,65 @@ const Main = () => {
 const Header = () => {
   return (
     <header class="pl-4 pt-3 self-start inline-flex flex-col items-center">
-      <h1>
-        <span class="text-pink-200">さんすう</span>
-        <span class="text-yellow-100">シャウト</span>
-      </h1>
-      <p class="text-green-100" style="letter-spacing:1px">
-        こたえが わかったら さけんでね
-      </p>
+      <a class="no-underline" href="/">
+        <h1 class="text-2em">
+          <span class="text-pink-200">さんすう</span>
+          <span class="text-yellow-100">シャウト</span>
+        </h1>
+        <p class="text-green-100" style="letter-spacing:1px">
+          こたえが わかったら さけんでね
+        </p>
+      </a>
     </header>
   );
 };
 
+const LabeledCheckbox = ({
+  checked,
+  onChange,
+  children,
+}: {
+  checked?: boolean;
+  onChange?: JSX.InputHTMLAttributes<HTMLInputElement>["onChange"];
+  children: JSX.Element;
+}) => (
+  <label class="block cursor-pointer flex items-center select-none gap-0.5em mb-0.125em text-4vw">
+    <input class="w-1em h-1em" type="checkbox" checked={checked} onChange={onChange} />
+    {children}
+  </label>
+);
+
 const App = () => {
   const [started, setStarted] = createSignal(false);
+  const [questionsEnabled, setQuestionsEnabled] = createSignal(questionFactories.map(() => true));
   return (
     <div class="h-full flex flex-col items-stretch">
       <Header />
       {started() ? (
         <Main />
       ) : (
-        <main class="flex-auto flex items-center justify-center text-12vw">
-          <button class="border-b-current border-b-3" type="button" onClick={() => setStarted(true)}>
+        <main class="flex-auto flex flex-col items-center justify-center">
+          <div>
+            <For each={questionFactories}>
+              {({ displayText }, i) => (
+                <LabeledCheckbox
+                  checked={questionsEnabled()[i()]}
+                  onChange={(e) => setQuestionsEnabled((current) => Object.assign([...current], { [i()]: e.currentTarget.checked }))}
+                  children={displayText}
+                />
+              )}
+            </For>
+          </div>
+          <button
+            class="border-b-current border-b-3 text-12vw mt-0.125em disabled:(opacity-70 cursor-default border-b-transparent)"
+            type="button"
+            disabled={!questionsEnabled().some(Boolean)}
+            onClick={() => {
+              setFilteredQuestionFactories(questionFactories.filter((_, i) => questionsEnabled()[i]));
+              setQuestion(createQuestion());
+              setStarted(true);
+            }}
+          >
             はじめる
           </button>
         </main>

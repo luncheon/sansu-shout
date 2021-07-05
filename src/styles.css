@@ -13,6 +13,14 @@
 
 * {
   margin: 0;
+  font-size: inherit;
+}
+
+:root {
+  line-height: 1.2;
+}
+:root * {
+  line-height: inherit; /* WindiCSS の text-xx が line-height を変えてしまう問題対策 */
 }
 
 html,
@@ -25,7 +33,6 @@ body {
   font-family: crayon, sans-serif;
   background: linear-gradient(hsl(150, 50%, 24%), hsl(150, 50%, 16%));
   color: white;
-  line-height: 1.2;
 }
 
 button {
