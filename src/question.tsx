@@ -11,27 +11,28 @@ interface QuestionFactory {
 
 const randomInt = (upper: number) => (Math.random() * upper) | 0;
 const speechNumber = (n: number) => (n === 0 ? "ゼロ" : n);
+const binaryQuestion = (
+  displayText: string,
+  maxX: number,
+  maxY: number,
+  q: (x: number, y: number) => [number, string, string]
+): QuestionFactory => ({
+  displayText,
+  question: () => {
+    const [correctAnswer, displayText, speechText] = q(randomInt(maxX), randomInt(maxY));
+    return { correctAnswer, displayText, speechText };
+  },
+});
 
 export const questionFactories: QuestionFactory[] = [
-  {
-    displayText: "20 までの たしざん",
-    question: () => {
-      const x = randomInt(20);
-      const y = randomInt(20);
-      return { correctAnswer: x + y, displayText: `${x} + ${y} = `, speechText: `${speechNumber(x)} たす ${speechNumber(y)} は?` };
-    },
-  },
-  {
-    displayText: "20 までの ひきざん",
-    question: () => {
-      let x = randomInt(20);
-      let y = randomInt(20);
-      if (x < y) {
-        [x, y] = [y, x];
-      }
-      return { correctAnswer: x - y, displayText: `${x} - ${y} = `, speechText: `${speechNumber(x)} ひく ${speechNumber(y)} は?` };
-    },
-  },
+  binaryQuestion("20 までの たしざん", 20, 20, (x, y) => [x + y, `${x} + ${y} = `, `${speechNumber(x)} たす ${speechNumber(y)} は?`]),
+  binaryQuestion("20 までの ひきざん", 20, 20, (x, y) => {
+    if (x < y) {
+      [x, y] = [y, x];
+    }
+    return [x - y, `${x} - ${y} = `, `${speechNumber(x)} ひく ${speechNumber(y)} は?`];
+  }),
+  binaryQuestion("かけざん くく", 10, 10, (x, y) => [x * y, `${x} × ${y} = `, `${speechNumber(x)} かける ${speechNumber(y)} は?`]),
 ];
 
 export const QuestionAndAnswer = (props: { question: Question; answer?: number }) => {
