@@ -52,7 +52,7 @@ const recognition = assign(new (window.SpeechRecognition ?? window.webkitSpeechR
       });
     } else {
       setSpokenWord(spokenWord);
-      answerTimerId = setTimeout(answer, 1000);
+      answerTimerId = setTimeout(answer, 600);
     }
   },
 });
