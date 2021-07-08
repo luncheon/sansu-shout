@@ -162,7 +162,7 @@ const App = () => {
         <Main />
       ) : (
         <main class="flex-auto flex flex-col items-center justify-center">
-          <div class="text-4vw">
+          <div style:font-size="min(6vw,6vh)">
             <For each={questionFactories}>
               {({ displayText }, i) => (
                 <LabeledCheckbox
@@ -174,7 +174,8 @@ const App = () => {
             </For>
           </div>
           <button
-            class="border-b-current border-b-3 text-12vw mt-0.125em disabled:(opacity-70 cursor-default border-b-transparent)"
+            class="border-b-current border-b-3 mt-0.125em disabled:(opacity-70 cursor-default border-b-transparent)"
+            style:font-size="min(18vw,18vh)"
             type="button"
             disabled={!questionsEnabled().some(Boolean)}
             onClick={() => {
