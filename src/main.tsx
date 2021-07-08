@@ -32,8 +32,7 @@ const recognition = assign(new (window.SpeechRecognition ?? window.webkitSpeechR
       setSpokenWord("");
       setRecognitionError();
     });
-    const start: () => unknown = () => (speechSynthesis.speaking ? setTimeout(start, 200) : recognition.start());
-    start();
+    startRecognition();
   },
   onaudiostart: () => setSpeaking(true),
   onerror: (e) => {
@@ -56,9 +55,10 @@ const recognition = assign(new (window.SpeechRecognition ?? window.webkitSpeechR
     }
   },
 });
+const startRecognition: () => unknown = () => (speechSynthesis.speaking ? setTimeout(startRecognition, 200) : recognition.start());
 
 const Main = () => {
-  recognition.start();
+  setTimeout(startRecognition, 200);
   const utterance = assign(new SpeechSynthesisUtterance(), { lang, rate: 1.1, pitch: 1.1, onstart: () => recognition.stop() });
   const speak = (text: string) => {
     utterance.text = text;
