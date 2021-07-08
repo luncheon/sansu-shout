@@ -1,3 +1,4 @@
+import builtTimestamp from "built-timestamp";
 import { batch, createEffect, createMemo, createSignal, For, JSX } from "solid-js";
 import { render } from "solid-js/web";
 import "virtual:windi.css";
@@ -114,6 +115,12 @@ const Main = () => {
 };
 
 const Header = () => {
+  const iso = new Date(builtTimestamp).toISOString();
+  const ver = iso
+    .replace(/[-]/g, ".")
+    .replace(/T/, "-")
+    .replace(/\.[0-9]{3}Z$/, "")
+    .replace(/:/g, "");
   return (
     <header class="pl-4 pt-3 self-start inline-flex flex-col items-center">
       <a class="no-underline" href="/">
@@ -121,10 +128,11 @@ const Header = () => {
           <span class="text-pink-200">さんすう</span>
           <span class="text-yellow-100">シャウト</span>
         </h1>
-        <p class="text-green-100" style="letter-spacing:1px">
-          こたえが わかったら さけんでね
-        </p>
+        <p class="tracking-1px text-green-100">こたえが わかったら さけんでね</p>
       </a>
+      <time class="tracking-3px text-transparent selection:text-orange-100" datetime={iso}>
+        {ver}
+      </time>
     </header>
   );
 };
@@ -138,7 +146,7 @@ const LabeledCheckbox = ({
   onChange?: JSX.InputHTMLAttributes<HTMLInputElement>["onChange"];
   children: JSX.Element;
 }) => (
-  <label class="block cursor-pointer flex items-center select-none gap-0.5em mb-0.125em text-4vw">
+  <label class="block cursor-pointer flex items-center select-none gap-0.5em mb-0.125em">
     <input class="w-1em h-1em" type="checkbox" checked={checked} onChange={onChange} />
     {children}
   </label>
@@ -154,7 +162,7 @@ const App = () => {
         <Main />
       ) : (
         <main class="flex-auto flex flex-col items-center justify-center">
-          <div>
+          <div class="text-4vw">
             <For each={questionFactories}>
               {({ displayText }, i) => (
                 <LabeledCheckbox

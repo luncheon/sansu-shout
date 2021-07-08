@@ -13,5 +13,13 @@ export default defineConfig({
       },
     },
   },
-  plugins: [windiCssPlugin({ config: { prefixer: false, preflight: false } }), solidPlugin()],
+  plugins: [
+    windiCssPlugin({ config: { prefixer: false, preflight: false } }),
+    solidPlugin(),
+    {
+      name: "built-timestamp-plugin",
+      resolveId: (source) => (source === "built-timestamp" ? source : null),
+      load: (id) => (id === "built-timestamp" ? `export default ${Date.now()}` : null),
+    },
+  ],
 });
