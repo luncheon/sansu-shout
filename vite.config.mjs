@@ -1,23 +1,26 @@
-import { defineConfig } from "vite";
+import isaaccssPlugin from "isaaccss/vite";
+import openProps from "open-props";
+import postcssJitProps from "postcss-jit-props";
 import solidPlugin from "vite-plugin-solid";
-import windiCssPlugin from "vite-plugin-windicss";
 
-export default defineConfig({
+/** @type {import("vite").UserConfig} */
+export default {
+  clearScreen: false,
   base: "",
   build: {
     outDir: "docs",
     assetsDir: "",
     rollupOptions: {
       output: {
-        assetFileNames: `[name].[ext]`,
-        chunkFileNames: `[name].[ext]`,
-        entryFileNames: `[name].js`,
+        assetFileNames: "[name].[ext]",
+        chunkFileNames: "[name].[ext]",
+        entryFileNames: "[name].js",
         manualChunks: undefined,
       },
     },
   },
   plugins: [
-    windiCssPlugin({ config: { prefixer: false, preflight: false } }),
+    isaaccssPlugin({ postcss: { plugins: [postcssJitProps(openProps)] } }),
     solidPlugin(),
     {
       name: "built-timestamp-plugin",
@@ -25,4 +28,4 @@ export default defineConfig({
       load: (id) => (id === "built-timestamp" ? `export default ${Date.now()}` : null),
     },
   ],
-});
+};

@@ -1,3 +1,5 @@
+import { is } from "isaaccss";
+
 interface Question {
   correctAnswer: number;
   displayText: string;
@@ -37,9 +39,9 @@ export const questionFactories: QuestionFactory[] = [
 
 export const QuestionAndAnswer = (props: { question: Question; answer?: number }) => {
   return (
-    <div class="flex items-center justify-center whitespace-pre">
+    <div class={is`d:flex a-items:center j-content:center white-space:pre`}>
       <span>{props.question.displayText}</span>
-      <span class="w-2ex">{props.answer}</span>
+      <span class={is`w:2ex`}>{props.answer}</span>
     </div>
   );
 };

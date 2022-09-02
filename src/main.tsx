@@ -1,7 +1,7 @@
 import builtTimestamp from "built-timestamp";
+import { is } from "isaaccss";
 import { batch, createEffect, createMemo, createSignal, For, JSX } from "solid-js";
 import { render } from "solid-js/web";
-import "virtual:windi.css";
 import correctImage from "./assets/correct.webp"; // https://www.ac-illust.com/main/detail.php?id=2637780
 import { QuestionAndAnswer, questionFactories, toAnswer } from "./question";
 import "./styles.css";
@@ -89,22 +89,22 @@ const Main = () => {
   });
   return (
     <>
-      <main class="relative flex-auto flex items-center justify-center text-12vw">
+      <main class={is`pos:relative flex:1 d:flex a-items:center j-content:center f-sz:12vw`}>
         <QuestionAndAnswer question={question()} answer={spokenAnswer() ?? undefined} />
         <img
-          class="absolute inset-0 m-auto pointer-events-none object-contain w-50vw h-50vh"
+          class={is`pos:absolute inset:0 m:auto pointer-events:none object-fit:contain w:50vw h:50vh`}
           src={correctImage}
           hidden={!answerIsCorrect()}
         />
       </main>
-      <div class="fixed left-4 bottom-3 font-sans">
-        <div class="font-bold text-xs opacity-60 mb-1">きこえた ことば</div>
+      <div class={is`pos:fixed left:16px bottom:12px f-family:sans-serif`}>
+        <div class={is`f-weight:bold f-sz:.75rem opacity:.6 m-b:4px`}>きこえた ことば</div>
         {spokenWord()}
         {speaking() ? "..." : "　"}
-        <span class="text-red-400">{recognitionError()}</span>
+        <span class={is`c:$red-4`}>{recognitionError()}</span>
       </div>
       <button
-        class="fixed right-4 bottom-2 p-0 text-xs opacity-60 border-b-current border-b-1 font-sans"
+        class={is`pos:fixed right:16px bottom:8px p:0 f-sz:.75rem opacity:.6 b-b-w:1px b-b-c:currentColor f-family:sans-serif`}
         type="button"
         onClick={() => recognition.stop()}
       >
@@ -122,15 +122,15 @@ const Header = () => {
     .replace(/\.[0-9]{3}Z$/, "")
     .replace(/:/g, "");
   return (
-    <header class="pl-4 pt-3 self-start inline-flex flex-col items-center">
-      <a class="no-underline" href="/">
-        <h1 class="text-2em">
-          <span class="text-pink-200">さんすう</span>
-          <span class="text-yellow-100">シャウト</span>
+    <header class={is`p-l:16px p-t:12px a-self:start d:inline-flex flex-direction:column a-items:center`}>
+      <a class={is`t-decoration:none`} href="/">
+        <h1 class={is`f-sz:2em`}>
+          <span class={is`c:$pink-2`}>さんすう</span>
+          <span class={is`c:$yellow-1`}>シャウト</span>
         </h1>
-        <p class="tracking-1px text-green-100">こたえが わかったら さけんでね</p>
+        <p class={is`letter-spacing:1px c:$green-1`}>こたえが わかったら さけんでね</p>
       </a>
-      <time class="tracking-3px text-transparent selection:text-orange-100" datetime={iso}>
+      <time class={is`letter-spacing:3px  c:transparent ::selection/c:$orange-1`} datetime={iso}>
         {ver}
       </time>
     </header>
@@ -146,8 +146,8 @@ const LabeledCheckbox = ({
   onChange?: JSX.InputHTMLAttributes<HTMLInputElement>["onChange"];
   children: JSX.Element;
 }) => (
-  <label class="block cursor-pointer flex items-center select-none gap-0.5em mb-0.125em">
-    <input class="w-1em h-1em" type="checkbox" checked={checked} onChange={onChange} />
+  <label class={is`d:block cursor:pointer d:flex a-items:center user-select:none gap:0.5em m-b:0.125em`}>
+    <input class={is`w:1em h:1em`} type="checkbox" checked={checked} onChange={onChange} />
     {children}
   </label>
 );
@@ -156,12 +156,12 @@ const App = () => {
   const [started, setStarted] = createSignal(false);
   const [questionsEnabled, setQuestionsEnabled] = createSignal(questionFactories.map(() => true));
   return (
-    <div class="h-full flex flex-col items-stretch">
+    <div class={is`h:100% d:flex flex-direction:column a-items:stretch`}>
       <Header />
       {started() ? (
         <Main />
       ) : (
-        <main class="flex-auto flex flex-col items-center justify-center">
+        <main class={is`flex:1 d:flex flex-direction:column a-items:center j-content:center`}>
           <div style:font-size="min(6vw,6vh)">
             <For each={questionFactories}>
               {({ displayText }, i) => (
@@ -174,7 +174,7 @@ const App = () => {
             </For>
           </div>
           <button
-            class="border-b-current border-b-3 mt-0.125em disabled:(opacity-70 cursor-default border-b-transparent)"
+            class={is`b-b-c:currentColor b-b-w:3 m-t:0.125em :disabled/opacity:.7 :disabled/cursor:default :disabled/b-b-c:transparent`}
             style:font-size="min(18vw,18vh)"
             type="button"
             disabled={!questionsEnabled().some(Boolean)}
