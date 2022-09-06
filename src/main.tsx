@@ -89,7 +89,7 @@ const Main = () => {
   });
   return (
     <>
-      <main class={is`pos:relative flex:1 d:flex a-items:center j-content:center f-sz:12vw`}>
+      <main class={is`pos:relative flex:1 d:flex align-items:center justify-content:center font-size:12vw`}>
         <QuestionAndAnswer question={question()} answer={spokenAnswer() ?? undefined} />
         <img
           class={is`pos:absolute inset:0 m:auto pointer-events:none object-fit:contain w:50vw h:50vh`}
@@ -97,14 +97,14 @@ const Main = () => {
           hidden={!answerIsCorrect()}
         />
       </main>
-      <div class={is`pos:fixed left:16px bottom:12px f-family:sans-serif`}>
-        <div class={is`f-weight:bold f-sz:.75rem opacity:.6 m-b:4px`}>きこえた ことば</div>
+      <div class={is`pos:fixed left:16px bottom:12px font-family:sans-serif`}>
+        <div class={is`font-weight:bold font-size:.75rem opacity:.6 m-b:4px`}>きこえた ことば</div>
         {spokenWord()}
         {speaking() ? "..." : "　"}
         <span class={is`c:$red-4`}>{recognitionError()}</span>
       </div>
       <button
-        class={is`pos:fixed right:16px bottom:8px p:0 f-sz:.75rem opacity:.6 b-b-w:1px b-b-c:currentColor f-family:sans-serif`}
+        class={is`pos:fixed right:16px bottom:8px p:0 font-size:.75rem opacity:.6 b-b-w:1px b-b-c:currentColor font-family:sans-serif`}
         type="button"
         onClick={() => recognition.stop()}
       >
@@ -122,9 +122,9 @@ const Header = () => {
     .replace(/\.[0-9]{3}Z$/, "")
     .replace(/:/g, "");
   return (
-    <header class={is`p-l:16px p-t:12px a-self:start d:inline-flex flex-direction:column a-items:center`}>
-      <a class={is`t-decoration:none`} href="/">
-        <h1 class={is`f-sz:2em`}>
+    <header class={is`p-l:16px p-t:12px align-self:start d:inline-flex flex-direction:column align-items:center`}>
+      <a class={is`text-decoration:none`} href="/">
+        <h1 class={is`font-size:2em`}>
           <span class={is`c:$pink-2`}>さんすう</span>
           <span class={is`c:$yellow-1`}>シャウト</span>
         </h1>
@@ -146,7 +146,7 @@ const LabeledCheckbox = ({
   onChange?: JSX.InputHTMLAttributes<HTMLInputElement>["onChange"];
   children: JSX.Element;
 }) => (
-  <label class={is`d:block cursor:pointer d:flex a-items:center user-select:none gap:0.5em m-b:0.125em`}>
+  <label class={is`d:block cursor:pointer d:flex align-items:center user-select:none gap:0.5em m-b:0.125em`}>
     <input class={is`w:1em h:1em`} type="checkbox" checked={checked} onChange={onChange} />
     {children}
   </label>
@@ -156,12 +156,12 @@ const App = () => {
   const [started, setStarted] = createSignal(false);
   const [questionsEnabled, setQuestionsEnabled] = createSignal(questionFactories.map(() => true));
   return (
-    <div class={is`h:100% d:flex flex-direction:column a-items:stretch`}>
+    <div class={is`h:100% d:flex flex-direction:column align-items:stretch`}>
       <Header />
       {started() ? (
         <Main />
       ) : (
-        <main class={is`flex:1 d:flex flex-direction:column a-items:center j-content:center`}>
+        <main class={is`flex:1 d:flex flex-direction:column align-items:center justify-content:center`}>
           <div style:font-size="min(6vw,6vh)">
             <For each={questionFactories}>
               {({ displayText }, i) => (

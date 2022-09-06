@@ -39,7 +39,7 @@ export const questionFactories: QuestionFactory[] = [
 
 export const QuestionAndAnswer = (props: { question: Question; answer?: number }) => {
   return (
-    <div class={is`d:flex a-items:center j-content:center white-space:pre`}>
+    <div class={is`d:flex align-items:center justify-content:center white-space:pre`}>
       <span>{props.question.displayText}</span>
       <span class={is`w:2ex`}>{props.answer}</span>
     </div>
