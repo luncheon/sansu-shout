@@ -16,7 +16,7 @@
   "devDependencies": {
     "@types/dom-speech-recognition": "^0.0.1",
     "fontmin": "^0.9.9",
-    "isaaccss": "^0.9.1",
+    "isaaccss": "^0.11.1",
     "open-props": "^1.4.14",
     "postcss-jit-props": "^1.0.7",
     "prettier": "^2.7.1",

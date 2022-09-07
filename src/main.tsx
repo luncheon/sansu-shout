@@ -130,7 +130,7 @@ const Header = () => {
         </h1>
         <p class={is`letter-spacing:1px c:$green-1`}>こたえが わかったら さけんでね</p>
       </a>
-      <time class={is`letter-spacing:3px  c:transparent ::selection/c:$orange-1`} datetime={iso}>
+      <time class={is`letter-spacing:3px c:transparent ::selection/c:$orange-1`} datetime={iso}>
         {ver}
       </time>
     </header>
@@ -174,7 +174,7 @@ const App = () => {
             </For>
           </div>
           <button
-            class={is`b-b-c:currentColor b-b-w:3 m-t:0.125em :disabled/opacity:.7 :disabled/cursor:default :disabled/b-b-c:transparent`}
+            class={is`b-b-c:currentColor b-b-w:3 m-t:0.125em :disabled/opacity:.7;cursor:default;b-b-c:transparent`}
             style:font-size="min(18vw,18vh)"
             type="button"
             disabled={!questionsEnabled().some(Boolean)}
